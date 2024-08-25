@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 import os
 import glob
 from pathlib import Path
@@ -33,6 +34,17 @@ def save_game_state(callsign, state):
             file.write(''.join(row) + '\n')
 
 
+def reset_grid(grid, state, callsign):
+    confirmed = messagebox.askokcancel(title='Confirmation',
+                                       message='Are you sure you want to clear the entire grid?')
+    if confirmed:
+        for i in range(10):
+            for j in range(10):
+                state[i][j] = 'b'
+                grid[i][j].configure(bg='light blue')
+        save_game_state(callsign, state)
+
+
 def create_gui(state, callsign):
     root = tk.Tk()
     root.title("Battleship Game")
@@ -47,8 +59,8 @@ def create_gui(state, callsign):
         elif state[i][j] == 'r':
             state[i][j] = 'h'
             label.configure(bg='black')
-        elif state[i][j] == 'h':  # when a black square is clicked
-            state[i][j] = 'b'  # change it back to light blue
+        elif state[i][j] == 'h':
+            state[i][j] = 'b'
             label.configure(bg='light blue')
 
         save_game_state(callsign, state)
@@ -73,6 +85,10 @@ def create_gui(state, callsign):
                                                                                                      callsign, state))
             row.append(label)
         grid.append(row)
+
+    reset_button = tk.Button(root, text="Reset", command=lambda: reset_grid(grid, state, callsign))
+    reset_button.grid(row=11, column=0, columnspan=10)
+
     root.mainloop()
 
 
