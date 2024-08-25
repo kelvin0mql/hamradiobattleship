@@ -47,6 +47,9 @@ def create_gui(state, callsign):
         elif state[i][j] == 'r':
             state[i][j] = 'h'
             label.configure(bg='black')
+        elif state[i][j] == 'h':  # when a black square is clicked
+            state[i][j] = 'b'  # change it back to light blue
+            label.configure(bg='light blue')
 
         save_game_state(callsign, state)
 
