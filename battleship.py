@@ -41,7 +41,16 @@ def reset_grid(grid, state, callsign):
 
 def create_gui(state, callsign, root):
     frame = tk.Frame(root)
-    frame.pack(side="left")
+    frame.pack(side="left", padx=5, pady=5)
+    grid_labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+
+    # Add labels to the top of the grid
+    for j in range(10):
+        tk.Label(frame, text=str(j + 1)).grid(row=0, column=j + 1)
+
+    # Add labels to left of the grid.
+    for i in range(10):
+        tk.Label(frame, text=grid_labels[i]).grid(row=i + 1, column=0)
 
     def on_click(i, j, label, callsign, state):
         if state[i][j] == 'b':
@@ -73,7 +82,7 @@ def create_gui(state, callsign, root):
             elif state[i][j] == 's':
                 color = 'black'
             label = tk.Label(frame, width=2, height=1, bg=color)
-            label.grid(row=i, column=j, padx=1, pady=1)
+            label.grid(row=i + 1, column=j + 1, padx=1, pady=1)
             label.bind('<Button-1>',
                        lambda event, i=i, j=j, label=label, callsign=callsign, state=state: on_click(i, j, label,
                                                                                                      callsign, state))
@@ -81,7 +90,7 @@ def create_gui(state, callsign, root):
         grid.append(row)
 
     reset_button = tk.Button(frame, text=f"Reset {callsign}", command=lambda: reset_grid(grid, state, callsign))
-    reset_button.grid()
+    reset_button.grid(row=12, column=1, columnspan=10, sticky="nsew")
 
 
 def main():
