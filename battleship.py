@@ -80,8 +80,8 @@ def create_gui(state, callsign, root):
             row.append(label)
         grid.append(row)
 
-    reset_button = tk.Button(root, text=f"Reset {callsign}", command=lambda: reset_grid(grid, state, callsign))
-    reset_button.pack()
+    reset_button = tk.Button(frame, text=f"Reset {callsign}", command=lambda: reset_grid(grid, state, callsign))
+    reset_button.grid()
 
 
 def main():
