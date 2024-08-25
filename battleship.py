@@ -5,24 +5,18 @@ import glob
 from pathlib import Path
 
 
-def load_game_state(callsign=None):
+def load_game_state(fname):
     home = str(Path.home())
-    battleship_files = glob.glob(home + "/battleship-*.txt")
-    if battleship_files:
-        filename = os.path.basename(battleship_files[0])
-        callsign = filename.replace("battleship-", "").replace(".txt", "")
-    elif callsign is None:
-        callsign = input("Enter your callsign: ")
+    filepath = os.path.join(home, fname)
 
-    filename = f'battleship-{callsign}.txt'
+    if os.path.exists(filepath):
+        with open(filepath, 'r') as file:
+            lines = file.readlines()
+        state = [list(line.strip()) for line in lines]
+    else:
+        state = [['b'] * 10 for _ in range(10)]
 
-    filepath = os.path.join(home, filename)
-    if not os.path.exists(filepath):
-        return [['b'] * 10 for _ in range(10)], callsign
-    with open(filepath, 'r') as file:
-        lines = file.readlines()
-    state = [list(line.strip()) for line in lines]
-    return state, callsign
+    return state, fname.replace(".txt", "").replace("battleship-", "")
 
 
 def save_game_state(callsign, state):
@@ -45,9 +39,9 @@ def reset_grid(grid, state, callsign):
         save_game_state(callsign, state)
 
 
-def create_gui(state, callsign):
-    root = tk.Tk()
-    root.title("Battleship Game")
+def create_gui(state, callsign, root):
+    frame = tk.Frame(root)
+    frame.pack(side="left")
 
     def on_click(i, j, label, callsign, state):
         if state[i][j] == 'b':
@@ -78,7 +72,7 @@ def create_gui(state, callsign):
                 color = 'red'
             elif state[i][j] == 's':
                 color = 'black'
-            label = tk.Label(root, width=2, height=1, bg=color)
+            label = tk.Label(frame, width=2, height=1, bg=color)
             label.grid(row=i, column=j, padx=1, pady=1)
             label.bind('<Button-1>',
                        lambda event, i=i, j=j, label=label, callsign=callsign, state=state: on_click(i, j, label,
@@ -86,16 +80,22 @@ def create_gui(state, callsign):
             row.append(label)
         grid.append(row)
 
-    reset_button = tk.Button(root, text="Reset", command=lambda: reset_grid(grid, state, callsign))
-    reset_button.grid(row=11, column=0, columnspan=10)
-
-    root.mainloop()
+    reset_button = tk.Button(root, text=f"Reset {callsign}", command=lambda: reset_grid(grid, state, callsign))
+    reset_button.pack()
 
 
 def main():
-    state, callsign = load_game_state()
-    create_gui(state, callsign)
-    save_game_state(callsign, state)
+    home = str(Path.home())
+    battleship_files = [os.path.basename(x) for x in glob.glob(home + "/battleship-*.txt")]
+
+    root = tk.Tk()
+    root.title("Battleship Game")
+
+    for file in battleship_files:
+        state, callsign = load_game_state(file)
+        create_gui(state, callsign, root)
+
+    root.mainloop()
 
 
 main()
