@@ -1,5 +1,4 @@
 import tkinter as tk
-from tkinter import messagebox
 import os
 import glob
 from pathlib import Path
@@ -14,7 +13,6 @@ def load_game_state(callsign=None):
     elif callsign is None:
         callsign = input("Enter your callsign: ")
 
-    # Moved filename assignment here
     filename = f'battleship-{callsign}.txt'
 
     filepath = os.path.join(home, filename)
@@ -24,6 +22,7 @@ def load_game_state(callsign=None):
         lines = file.readlines()
     state = [list(line.strip()) for line in lines]
     return state, callsign
+
 
 def save_game_state(callsign, state):
     home = str(Path.home())
@@ -48,11 +47,7 @@ def create_gui(state, callsign):
         elif state[i][j] == 'r':
             state[i][j] = 'h'
             label.configure(bg='black')
-            for x in range(i - 1, i + 2):  # Managing columns
-                for y in range(j - 1, j + 2):  # Managing rows
-                    if (0 <= x < 10) and (0 <= y < 10) and state[x][y] == 'r':
-                        state[x][y] = 'h'
-                        grid[x][y].configure(bg='black')
+
         save_game_state(callsign, state)
 
     grid = []
