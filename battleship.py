@@ -1,130 +1,134 @@
 import tkinter as tk
 from tkinter import simpledialog
-from tkinter import messagebox
+from pathlib import Path
 import os
 import glob
-from pathlib import Path
 
 
-def load_game_state(fname):
+def create_gui(state, view_only_state, callsign, root):
+    frame = tk.Frame(root)
+    frame.pack(side="left", padx=5, pady=5)
+    grid_labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+
+    def on_click(i, j, label, callsign, state, view_only_state):
+        if state[i][j] == 'b':
+            view_only_state[i][j] = 'm'
+            state[i][j] = 'm'
+            label.configure(bg='white', text=' ')
+        elif state[i][j] == 'm':
+            state[i][j] = 'H'
+            view_only_state[i][j] = 'H'
+            label.configure(bg='red', text=' ')
+        elif state[i][j] == 'H':
+            state[i][j] = 'S'
+            view_only_state[i][j] = 'S'
+            label.configure(bg='black', text=' ')
+        elif state[i][j] == 'S':
+            view_only_state[i][j] = 'b'
+            state[i][j] = 'b'
+            label.configure(bg='light blue', text=' ')
+        save_game_state(callsign, state, view_only_state)
+
+    def on_right_click(i, j, label, callsign, state, view_only_state):
+        if state[i][j] == 'b':
+            state[i][j] = 'B'
+            label.configure(bg='light blue', text='⚓')
+        elif state[i][j] == 'B':
+            state[i][j] = 'b'
+            label.configure(bg='light blue', text=' ')
+        save_game_state(callsign, state, view_only_state)
+
+    for j in range(10):
+        tk.Label(frame, text=str(j + 1)).grid(row=0, column=j + 1)
+    for i in range(10):
+        tk.Label(frame, text=grid_labels[i]).grid(row=i + 1, column=0)
+
+    for i in range(10):
+        for j in range(10):
+            color = 'light blue' if state[i][j].lower() == 'b' else (
+                'white' if state[i][j] == 'm' else 'red' if state[i][j] == 'H' else 'black')
+            text = '⚓' if state[i][j] == 'B' else ' '
+            label = tk.Label(frame, width=2, height=1, bg=color, text=text)
+            label.grid(row=i + 1, column=j + 1, padx=1, pady=1)
+            label.bind('<Button-1>', lambda event, i=i, j=j, label=label, callsign=callsign, state=state,
+                                            view_only_state=view_only_state: on_click(i, j, label, callsign, state,
+                                                                                      view_only_state))
+            label.bind('<Button-3>', lambda event, i=i, j=j, label=label, callsign=callsign, state=state,
+                                            view_only_state=view_only_state: on_right_click(i, j, label, callsign,
+                                                                                            state, view_only_state))
+
+    reset_button = tk.Button(frame, text=f'Reset {callsign}', command=lambda: reset_grid(grid, state, callsign))
+    reset_button.grid(row=12, column=1, columnspan=10, sticky='nsew')
+
+def save_game_state(callsign, state, view_only_state):
+    home = str(Path.home())
+    dropbox_path = os.path.join(home, 'Dropbox')
+
+    private_filepath = os.path.join(home, f"battleship-{callsign}_private.txt")
+    public_filepath = os.path.join(dropbox_path, f"battleship-{callsign}.txt")
+
+    with open(private_filepath, 'w') as file:
+        for row in state:
+            file.write(''.join(row) + '\n')
+    with open(public_filepath, 'w') as file:
+        for row in view_only_state:
+            file.write(''.join(row) + '\n')
+
+
+def load_game_state(fname, battleship_type):
     home = str(Path.home())
     filepath = os.path.join(home, fname)
 
     if os.path.exists(filepath):
         with open(filepath, 'r') as file:
             lines = file.readlines()
-        state = [list(line.strip()) for line in lines]
+
+        if not lines:
+            state = [['b'] * 10 for _ in range(10)]
+            view_only_state = [['b'] * 10 for _ in range(10)]
+        else:
+            state = [list(line.strip()) for line in lines]
+            if battleship_type == "private":
+                view_only_state = [[char.lower() for char in row] for row in state]
+            else:
+                view_only_state = state
     else:
         state = [['b'] * 10 for _ in range(10)]
+        view_only_state = [['b'] * 10 for _ in range(10)]
 
-    return state, fname.replace(".txt", "").replace("battleship-", "")
-
-
-def save_game_state(callsign, state):
-    home = str(Path.home())
-    filename = f'battleship-{callsign}.txt'
-    filepath = os.path.join(home, filename)
-    with open(filepath, 'w') as file:
-        for row in state:
-            file.write(''.join(row) + '\n')
-
+    callsign = fname.replace("battleship-", "").replace(home + "/", "").replace("_private.txt", "").replace(".txt", "")
+    return state, view_only_state, callsign
 
 def reset_grid(grid, state, callsign):
-    confirmed = messagebox.askokcancel(title='Confirmation',
-                                       message='Are you sure you want to clear the entire grid?')
-    if confirmed:
-        for i in range(10):
-            for j in range(10):
-                state[i][j] = state[i][j].lower()
-                grid[i][j].configure(bg='light blue', text='')
-        save_game_state(callsign, state)
-
-
-def create_gui(state, callsign, root):
-    frame = tk.Frame(root)
-    frame.pack(side="left", padx=5, pady=5)
-    grid_labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
-
-    # Add labels to the top of the grid
-    for j in range(10):
-        tk.Label(frame, text=str(j + 1)).grid(row=0, column=j + 1)
-
-    # Add labels to left of the grid.
     for i in range(10):
-        tk.Label(frame, text=grid_labels[i]).grid(row=i + 1, column=0)
-
-    def on_click(i, j, label, callsign, state):
-        if state[i][j] == 'B':
-            state[i][j] = 'H'
-            label.configure(bg='red', text='⚓')
-        elif state[i][j] == 'H':
-            state[i][j] = 'S'
-            label.configure(bg='black', text='⚓')
-        elif state[i][j] == 'S':
-            state[i][j] = 'B'
-            label.configure(bg='light blue', text='⚓')
-        elif state[i][j].lower() == 'b':
-            state[i][j] = 'm'
-            label.configure(bg='white', text='')
-        elif state[i][j].lower() == 'm':
-            state[i][j] = 'R'
-            label.configure(bg='red', text='')
-        elif state[i][j].lower() == 'r':
-            state[i][j] = 'h'
-            label.configure(bg='black', text='')
-        elif state[i][j].lower() == 'h':
-            state[i][j] = 'b'
-            label.configure(bg='light blue', text='')
-    save_game_state(callsign, state)
-
-    def on_right_click(i, j, label, callsign, state):
-        if state[i][j].islower():
-            state[i][j] = state[i][j].upper()
-            label.configure(text='⚓')
-        else:
-            state[i][j] = state[i][j].lower()
-            label.configure(text='')
-        save_game_state(callsign, state)
-
-    grid = []
-    for i in range(10):
-        row = []
         for j in range(10):
-            color = 'light blue'
-            text = '' if state[i][j].islower() else '⚓'
-            label = tk.Label(frame, width=2, height=1, bg=color, text=text)
-            label.grid(row=i + 1, column=j + 1, padx=1, pady=1)
-            label.bind('<Button-1>',
-                       lambda event, label=label, i=i, j=j, callsign=callsign, state=state: on_click(i, j, label, callsign, state))
-            label.bind('<Button-2>',
-                       lambda event, label=label, i=i, j=j, callsign=callsign, state=state: on_right_click(i, j, label, callsign, state))
-            row.append(label)
-        grid.append(row)
-
-    reset_button = tk.Button(frame, text=f'Reset {callsign}', command=lambda: reset_grid(grid, state, callsign))
-    reset_button.grid(row=12, column=1, columnspan=10, sticky='nsew')
+            state[i][j] = 'b'
+    save_game_state(callsign, state, state)  # Make sure to save the newly reset state
 
 
 def main():
     home = str(Path.home())
-    battleship_files = [os.path.basename(x) for x in glob.glob(home + "/battleship-*.txt")]
+    battleship_files_private = glob.glob(home + "/battleship-*_private.txt")
+    battleship_files_private.sort(reverse=True)
 
     root = tk.Tk()
     root.title("Battleship Game")
 
-    if not battleship_files:  # If there's no existing file
+    if not battleship_files_private:
         callsign = simpledialog.askstring("Enter callsign",
                                           "No save file found. Enter your callsign to create a new one.")
-        if callsign:  # If user entered a callsign
-            state = [['b'] * 10 for _ in range(10)]  # Create new state
-            save_game_state(callsign, state)  # Save state
-            create_gui(state, callsign, root)  # Create grid
-
+        if callsign:
+            state = [['b'] * 10 for _ in range(10)]
+            view_only_state = [['b'] * 10 for _ in range(10)]
+            save_game_state(callsign, state, view_only_state)
+            create_gui(state, view_only_state, callsign, root)
     else:
-        for file in battleship_files:  # Load grids for existing files
-            state, callsign = load_game_state(file)
-            create_gui(state, callsign, root)
+        for file in battleship_files_private:
+            state, view_only_state, callsign = load_game_state(file, "private")
+            create_gui(state, view_only_state, callsign, root)
 
     root.mainloop()
 
-main()
+
+if __name__ == "__main__":
+    main()
