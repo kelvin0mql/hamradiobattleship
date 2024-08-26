@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import simpledialog
 from tkinter import messagebox
 import os
 import glob
@@ -111,11 +112,19 @@ def main():
     root = tk.Tk()
     root.title("Battleship Game")
 
-    for file in battleship_files:
-        state, callsign = load_game_state(file)
-        create_gui(state, callsign, root)
+    if not battleship_files:  # If there's no existing file
+        callsign = simpledialog.askstring("Enter callsign",
+                                          "No save file found. Enter your callsign to create a new one.")
+        if callsign:  # If user entered a callsign
+            state = [['b'] * 10 for _ in range(10)]  # Create new state
+            save_game_state(callsign, state)  # Save state
+            create_gui(state, callsign, root)  # Create grid
+
+    else:
+        for file in battleship_files:  # Load grids for existing files
+            state, callsign = load_game_state(file)
+            create_gui(state, callsign, root)
 
     root.mainloop()
-
 
 main()
