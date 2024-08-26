@@ -34,8 +34,8 @@ def reset_grid(grid, state, callsign):
     if confirmed:
         for i in range(10):
             for j in range(10):
-                state[i][j] = 'b'
-                grid[i][j].configure(bg='light blue')
+                state[i][j] = state[i][j].lower()
+                grid[i][j].configure(bg='light blue', text='')
         save_game_state(callsign, state)
 
 
@@ -53,19 +53,36 @@ def create_gui(state, callsign, root):
         tk.Label(frame, text=grid_labels[i]).grid(row=i + 1, column=0)
 
     def on_click(i, j, label, callsign, state):
-        if state[i][j] == 'b':
+        if state[i][j] == 'B':
+            state[i][j] = 'H'
+            label.configure(bg='red', text='⚓')
+        elif state[i][j] == 'H':
+            state[i][j] = 'S'
+            label.configure(bg='black', text='⚓')
+        elif state[i][j] == 'S':
+            state[i][j] = 'B'
+            label.configure(bg='light blue', text='⚓')
+        elif state[i][j].lower() == 'b':
             state[i][j] = 'm'
-            label.configure(bg='white')
-        elif state[i][j] == 'm':
-            state[i][j] = 'r'
-            label.configure(bg='red')
-        elif state[i][j] == 'r':
+            label.configure(bg='white', text='')
+        elif state[i][j].lower() == 'm':
+            state[i][j] = 'R'
+            label.configure(bg='red', text='')
+        elif state[i][j].lower() == 'r':
             state[i][j] = 'h'
-            label.configure(bg='black')
-        elif state[i][j] == 'h':
+            label.configure(bg='black', text='')
+        elif state[i][j].lower() == 'h':
             state[i][j] = 'b'
-            label.configure(bg='light blue')
+            label.configure(bg='light blue', text='')
+    save_game_state(callsign, state)
 
+    def on_right_click(i, j, label, callsign, state):
+        if state[i][j].islower():
+            state[i][j] = state[i][j].upper()
+            label.configure(text='⚓')
+        else:
+            state[i][j] = state[i][j].lower()
+            label.configure(text='')
         save_game_state(callsign, state)
 
     grid = []
@@ -73,24 +90,18 @@ def create_gui(state, callsign, root):
         row = []
         for j in range(10):
             color = 'light blue'
-            if state[i][j] == 'm':
-                color = 'white'
-            elif state[i][j] == 'h':
-                color = 'black'
-            elif state[i][j] == 'r':
-                color = 'red'
-            elif state[i][j] == 's':
-                color = 'black'
-            label = tk.Label(frame, width=2, height=1, bg=color)
+            text = '' if state[i][j].islower() else '⚓'
+            label = tk.Label(frame, width=2, height=1, bg=color, text=text)
             label.grid(row=i + 1, column=j + 1, padx=1, pady=1)
             label.bind('<Button-1>',
-                       lambda event, i=i, j=j, label=label, callsign=callsign, state=state: on_click(i, j, label,
-                                                                                                     callsign, state))
+                       lambda event, label=label, i=i, j=j, callsign=callsign, state=state: on_click(i, j, label, callsign, state))
+            label.bind('<Button-2>',
+                       lambda event, label=label, i=i, j=j, callsign=callsign, state=state: on_right_click(i, j, label, callsign, state))
             row.append(label)
         grid.append(row)
 
-    reset_button = tk.Button(frame, text=f"Reset {callsign}", command=lambda: reset_grid(grid, state, callsign))
-    reset_button.grid(row=12, column=1, columnspan=10, sticky="nsew")
+    reset_button = tk.Button(frame, text=f'Reset {callsign}', command=lambda: reset_grid(grid, state, callsign))
+    reset_button.grid(row=12, column=1, columnspan=10, sticky='nsew')
 
 
 def main():
