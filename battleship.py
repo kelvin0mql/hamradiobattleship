@@ -70,41 +70,41 @@ def create_gui(state, view_only_state, callsign, root):
     grid_labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 
     def on_click(i, j, label, callsign, state, view_only_state):
-        if state[i][j] == 'b':
-            view_only_state[i][j] = 'm'
-            state[i][j] = 'm'
-            label.configure(bg='white', text=' ')
-            save_game_state(callsign, state, view_only_state)  # save game state after updating to 'm'
-        elif state[i][j] == 'm':
-            view_only_state[i][j] = 'H'
-            state[i][j] = 'H'
-            label.configure(bg='red', text=' ')
-            save_game_state(callsign, state, view_only_state)  # save game state after updating to 'H'
-        elif state[i][j] == 'H':
-            state[i][j] = 'S'
-            view_only_state[i][j] = 'S'
-            label.configure(bg='black', text='⚓')  # Display anchor when cell is SUNK
-            save_game_state(callsign, state, view_only_state)  # save game state after hit turns into sunk
-        elif state[i][j] == 'S':
-            view_only_state[i][j] = 'b'
-            state[i][j] = 'b'
-            label.configure(bg='light blue', text=' ')
-            save_game_state(callsign, state, view_only_state)  # save game state after updating to 'b'
-        elif state[i][j] == 'B':
-            state[i][j] = 'H'
-            view_only_state[i][j] = 'H'
-            label.configure(bg='red', text='⚓')
-            save_game_state(callsign, state, view_only_state)  # save game state after updating to 'H'
+        if state[i][j].islower():
+            lower_state = state[i][j].lower()
+            if lower_state == 'b':
+                state[i][j] = 'm'
+                label.configure(bg='white', text=' ')
+            elif lower_state == 'm':
+                state[i][j] = 'h'
+                label.configure(bg='red', text=' ')
+            elif lower_state == 'h':
+                state[i][j] = 's'
+                label.configure(bg='black', text=' ')
+            elif lower_state == 's':
+                state[i][j] = 'b'
+                label.configure(bg='light blue', text=' ')
+        else:
+            if state[i][j] == 'B':
+                state[i][j] = 'H'
+                label.configure(bg='red', text='⚓')
+            elif state[i][j] == 'H':
+                state[i][j] = 'S'
+                label.configure(bg='black', text='⚓')
+            elif state[i][j] == 'S':
+                state[i][j] = 'B'
+                label.configure(bg='light blue', text='⚓')
+        save_game_state(callsign, state, view_only_state)
 
     def on_right_click(i, j, label, callsign, state, view_only_state):
-        if state[i][j] == 'b':
-            state[i][j] = 'B'
-            label.configure(bg='light blue', text='⚓')
-        elif state[i][j] == 'B':
-            state[i][j] = 'b'
-            label.configure(bg='light blue', text=' ')
-
-    save_game_state(callsign, state, view_only_state)
+        if state[i][j].islower():
+            state[i][j] = state[i][j].upper()
+            if state[i][j] != 'M':
+                label.configure(text='⚓')
+        else:
+            state[i][j] = state[i][j].lower()
+            label.configure(text=' ')
+        save_game_state(callsign, state, view_only_state)
 
     for j in range(10):
         tk.Label(frame, text=str(j + 1)).grid(row=0, column=j + 1)
@@ -113,10 +113,10 @@ def create_gui(state, view_only_state, callsign, root):
 
     for i in range(10):
         for j in range(10):
-            color = 'light blue' if state[i][j].lower() == 'b' else (
-                'white' if state[i][j] == 'm' else 'red' if state[i][j] == 'H' else 'black')
-            # add a condition here to display the anchor for 'H' and 'S'
-            text = '⚓' if state[i][j] in ['B', 'H', 'S'] else ' '
+            color = ('light blue' if state[i][j].lower() == 'b' else
+                     'white' if state[i][j].lower() == 'm' else
+                     'red' if state[i][j].lower() == 'h' else 'black')
+            text = '⚓' if state[i][j].isupper() else ' '
             label = tk.Label(frame, width=2, height=1, bg=color, text=text)
             label.grid(row=i + 1, column=j + 1, padx=1, pady=1)
             label.bind('<Button-1>', lambda event, i=i, j=j, label=label, callsign=callsign, state=state,
