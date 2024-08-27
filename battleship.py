@@ -134,13 +134,14 @@ def create_gui(state, view_only_state, callsign, root):
 
 def main():
     home = str(Path.home())
-    battleship_files_private = glob.glob(home + "/battleship-*_private.txt")
-    battleship_files_private.sort(reverse=True)
+    battleship_files = []
+    battleship_files.extend(glob.glob(home + "/battleship-*.txt"))
+    battleship_files.sort(reverse=True)
 
     root = tk.Tk()
     root.title("Battleship Game")
 
-    if not battleship_files_private:
+    if not battleship_files:
         callsign = simpledialog.askstring("Enter callsign",
                                           "No save file found. Enter your callsign to create a new one.")
         if callsign:
@@ -149,8 +150,9 @@ def main():
             save_game_state(callsign, state, view_only_state)
             create_gui(state, view_only_state, callsign, root)
     else:
-        for file in battleship_files_private:
-            state, view_only_state, callsign = load_game_state(file, "private")
+        for file in battleship_files:
+            battleship_type = "private" if "_private.txt" in file else "public"  # Determine battleship type based on filename
+            state, view_only_state, callsign = load_game_state(file, battleship_type)
             create_gui(state, view_only_state, callsign, root)
 
     root.mainloop()
