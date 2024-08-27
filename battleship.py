@@ -23,7 +23,7 @@ def save_public_game_state(callsign, state, mycallsign):
         public_filepath = os.path.join(dropbox_path, f"battleship-{callsign}.txt")
         with open(public_filepath, 'w') as file:
             for row in state:
-                file.write(''.join(row) + '\n')
+                file.write(''.join([cell.lower() for cell in row]) + '\n')
 
 
 def save_opponent_public_state(callsign, state, mycallsign):
