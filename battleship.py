@@ -7,17 +7,20 @@ import glob
 
 def save_game_state(callsign, state, view_only_state):
     home = str(Path.home())
-    dropbox_path = os.path.join(home, 'Dropbox')
-
     private_filepath = os.path.join(home, f"battleship-{callsign}_private.txt")
-    public_filepath = os.path.join(dropbox_path, f"battleship-{callsign}.txt")
 
     with open(private_filepath, 'w') as file:
         for row in state:
             file.write(''.join(row) + '\n')
-    with open(public_filepath, 'w') as file:
-        for row in view_only_state:
-            file.write(''.join(row) + '\n')
+
+    # Check if the public file of the user exists in the Dropbox directory
+    dropbox_path = os.path.join(home, 'Dropbox')
+    public_filepath = os.path.join(dropbox_path, f"battleship-{callsign}.txt")
+
+    if os.path.exists(public_filepath):
+        with open(public_filepath, 'w') as file:
+            for row in view_only_state:
+                file.write(''.join(row) + '\n')
 
 
 def load_game_state(fname, battleship_type):
@@ -38,8 +41,11 @@ def load_game_state(fname, battleship_type):
             else:
                 view_only_state = state
     else:
-        state = [['b'] * 10 for _ in range(10)]
-        view_only_state = [['b'] * 10 for _ in range(10)]
+        if "_private.txt" in filepath:  # do not create a new private file for opponents
+            state = [['b'] * 10 for _ in range(10)]
+            view_only_state = [['b'] * 10 for _ in range(10)]
+        else:
+            return None, None, None
 
     callsign = fname.replace("battleship-", "").replace(home + "/", "").replace("_private.txt", "").replace(".txt", "")
     return state, view_only_state, callsign
@@ -134,14 +140,22 @@ def create_gui(state, view_only_state, callsign, root):
 
 def main():
     home = str(Path.home())
-    battleship_files = []
-    battleship_files.extend(glob.glob(home + "/battleship-*.txt"))
-    battleship_files.sort(reverse=True)
+    battleship_files = glob.glob(home + "/battleship-*.txt")
 
     root = tk.Tk()
     root.title("Battleship Game")
 
-    if not battleship_files:
+    USER_PRIVATE_FILE = [file for file in battleship_files if "_private.txt" in file]
+    OTHER_FILES = [file for file in battleship_files if "_private.txt" not in file]
+    OTHER_FILES.sort(key=lambda x: x.split('-')[-1] if '-' in x else x)  # sort by callsign
+
+    if len(USER_PRIVATE_FILE) > 1:  # check for multiple private files
+        print(f"Error: More than one private file found: {USER_PRIVATE_FILE}. Please resolve this issue.")
+        return
+    elif USER_PRIVATE_FILE:  # load user private file GUI
+        state, view_only_state, callsign = load_game_state(USER_PRIVATE_FILE[0], "private")
+        create_gui(state, view_only_state, callsign, root)
+    else:  # ask for call sign and create new user private file GUI
         callsign = simpledialog.askstring("Enter callsign",
                                           "No save file found. Enter your callsign to create a new one.")
         if callsign:
@@ -149,10 +163,10 @@ def main():
             view_only_state = [['b'] * 10 for _ in range(10)]
             save_game_state(callsign, state, view_only_state)
             create_gui(state, view_only_state, callsign, root)
-    else:
-        for file in battleship_files:
-            battleship_type = "private" if "_private.txt" in file else "public"  # Determine battleship type based on filename
-            state, view_only_state, callsign = load_game_state(file, battleship_type)
+
+    for file in OTHER_FILES:  # load other files GUIs
+        state, view_only_state, callsign = load_game_state(file, "public")
+        if state is not None:
             create_gui(state, view_only_state, callsign, root)
 
     root.mainloop()
