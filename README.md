@@ -15,15 +15,19 @@ To run the game, type:
 It is assumed you'll use Dropbox to "publish" the current Hit/Miss/Sunk status of your board. After all, in a Ham Radio
 activity, you might be part way through a game when the bands shift and you lose contact with your opponent. While that
 can be frustrating, this is also part of *the point* of this version of the game. You can pick up instead with another
-opponent, so long as each of you can grab a copy of each other's shared/published `battleship-{callsign}.txt` file.
+opponent, so long as each of you can grab a copy of each other's shared/published file named:
+
+`battleship-{callsign}.txt`
 
 If you're not using Dropbox, you may want to adjust this script to use other means, be that OneDrive, GoogleDrive, or
 whatever. In an event with many active players, it will be important for whatever method you choose be something that
 can keep that file current "out there". But if you're just going to play one-on-one, starting with a blank grid for
 both players is the norm.
 
-So, whomever your opponent/s is/are, you will copy (or create) a file named `battleship-{callsign].txt` in your home
-directory for your opponent. Using a plain text editor, make 10 rows of 10 lower-case "b" characters, like this...
+So, whomever your opponent/s is/are, you will copy (or create) a file named: 
+
+`battleship-{callsign].txt` in your home directory for your opponent. If manually created, using a plain text editor, 
+make 10 rows of 10 lower-case "b" characters, like this...
 
 ```bbbbbbbbbb
 bbbbbbbbbb
@@ -38,7 +42,7 @@ bbbbbbbbbb
 ```
 That's the starting grid.
 
-At the start of the game (assuming there is no `battleship-{callsign}_private.txt` file in your home directory), you'll 
+When you start it (assuming there is no `battleship-{callsign}_private.txt` file in your home directory), you'll 
 be asked for your callsign, and a new game board will be created for you to play. Otherwise, your 
 previous game board(s) will load.
 
@@ -49,7 +53,9 @@ The game board consists of a 10x10 grid where each cell can occupy one of four s
 - `h`: Hit on a ship (red)
 - `s`: Sunk ship (black)
 
-An uppercase letter denotes the player's own ships. You'll be seeing these only in `battleship-{yourCallSign}_private.txt`.
+An uppercase letter denotes the player's own ships. You'll be seeing these only in
+
+`battleship-{yourCallSign}_private.txt`.
 
 ## How to Play
 
