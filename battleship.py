@@ -5,7 +5,7 @@ import os
 import glob
 
 
-def save_game_state(callsign, state, view_only_state):
+def save_private_game_state(callsign, state):
     home = str(Path.home())
     private_filepath = os.path.join(home, f"battleship-{callsign}_private.txt")
 
@@ -13,14 +13,15 @@ def save_game_state(callsign, state, view_only_state):
         for row in state:
             file.write(''.join(row) + '\n')
 
-    # Check if the public file of the user exists in the Dropbox directory
+
+def save_public_game_state(callsign, state):
+    home = str(Path.home())
+    # save a public file for the current user to the Dropbox directory
     dropbox_path = os.path.join(home, 'Dropbox')
     public_filepath = os.path.join(dropbox_path, f"battleship-{callsign}.txt")
-
-    if os.path.exists(public_filepath):
-        with open(public_filepath, 'w') as file:
-            for row in view_only_state:
-                file.write(''.join(row) + '\n')
+    with open(public_filepath, 'w') as file:
+        for row in state:
+            file.write(''.join(row) + '\n')
 
 
 def load_game_state(fname, battleship_type):
@@ -100,7 +101,11 @@ def create_gui(state, view_only_state, callsign, root):
             elif state[i][j] == 'S':
                 state[i][j] = 'B'
                 label.configure(bg='light blue', text='⚓')
-        save_game_state(callsign, state, view_only_state)
+
+    if "_private.txt" in f"battleship-{callsign}.txt":
+        save_private_game_state(callsign, state)
+    else:
+        save_public_game_state(callsign, state)
 
     def on_right_click(i, j, label, callsign, state, view_only_state):
         if state[i][j].islower():
@@ -136,7 +141,6 @@ def create_gui(state, view_only_state, callsign, root):
     reset_button.grid(row=12, column=1, columnspan=10, sticky='nsew')
 
     return frame
-
 
 def main():
     home = str(Path.home())
