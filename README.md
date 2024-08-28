@@ -99,3 +99,8 @@ different amounts of bonus points. Switch modes and bands for multipliers. e.g. 
 JS8Call, then on Olivia, then on CW... = x4 multipliers. Drop to 40m and do all 4 modes again, another x4. Consider 
 trying to complete a few salvos on Feld Hell! How 'bout PSK? RTTY, Contestia... see how many of the obscure modes in
 fldigi you can use to declare ultimate naval victory!!
+
+## Want To Start A Game With Me?
+
+Well, you'll need the current state of my battleship-N0MQL.txt file, which is on DropBox, but I have linked to the long
+and convoluted DropBox URL using https://tinyurl.com/battleship-n0mql
