@@ -138,7 +138,7 @@ def create_gui(state, view_only_state, callsign, root, mycallsign):
             color = ('light blue' if state[i][j] == 'b' or state[i][j] == 'B' else
                      'white' if state[i][j] == 'm' else
                      'red' if state[i][j].lower() == 'h' else 'black')
-            text = '⚓' if state[i][j].lower() != 'b' else ' '
+            text = '⚓' if state[i][j].isupper() and callsign == mycallsign else ' '
             label = labels[i][j] = tk.Label(frame, width=2, height=1, bg=color, text=text)
             label.grid(row=i + 1, column=j + 1, padx=1, pady=1)
             label.bind('<Button-1>',
