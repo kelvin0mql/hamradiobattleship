@@ -17,11 +17,18 @@ def save_private_game_state(callsign, state, mycallsign):
 def save_public_game_state(callsign, state, mycallsign):
     home = str(Path.home())
     dropbox_path = os.path.join(home, 'Dropbox')
+
+    if not os.path.exists(dropbox_path):
+        print(f"Dropbox directory does not exist at {dropbox_path}")
+        return
+
     if callsign == mycallsign:
         public_filepath = os.path.join(dropbox_path, f"battleship-{callsign}.txt")
         with open(public_filepath, 'w') as file:
             for row in state:
                 file.write(''.join([cell.lower() for cell in row]) + '\n')
+    else:
+        print(f"Callsign {callsign} does not match my callsign {mycallsign}. Not saving public game state.")
 
 
 def save_opponent_public_state(callsign, state, mycallsign):
@@ -49,7 +56,7 @@ def load_game_state(fname, battleship_type):
             else:
                 view_only_state = state
     else:
-        if "_private.txt" in filepath:  # do not create a new private file for opponents
+        if "_private.txt" in filepath:
             state = [['b'] * 10 for _ in range(10)]
             view_only_state = [['b'] * 10 for _ in range(10)]
         else:
@@ -70,7 +77,7 @@ def reset_grid(frame, state, callsign, mycallsign, labels):
     for i in range(10):
         for j in range(10):
             state[i][j] = 'b'
-            labels[i][j].config(text='', bg='light blue')  # Update the grid cell's text and color
+            labels[i][j].config(text='', bg='light blue')
     if callsign == mycallsign:
         save_private_game_state(callsign, state, mycallsign)
         save_public_game_state(callsign, state, mycallsign)
@@ -142,15 +149,11 @@ def create_gui(state, view_only_state, callsign, root, mycallsign):
             label = labels[i][j] = tk.Label(frame, width=2, height=1, bg=color, text=text)
             label.grid(row=i + 1, column=j + 1, padx=1, pady=1)
             label.bind('<Button-1>',
-                       lambda event, i=i, j=j, label=label, callsign=callsign, state=state,
-                              view_only_state=view_only_state: on_click(i, j, label, callsign, state, view_only_state))
+                       lambda event, i=i, j=j, label=label, callsign=callsign, state=state, view_only_state=view_only_state: on_click(i, j, label, callsign, state, view_only_state))
             label.bind('<Button-3>',
-                       lambda event, i=i, j=j, label=label, callsign=callsign, state=state,
-                              view_only_state=view_only_state: on_right_click(i, j, label, callsign, state,
-                                                                              view_only_state))
+                       lambda event, i=i, j=j, label=label, callsign=callsign, state=state, view_only_state=view_only_state: on_right_click(i, j, label, callsign, state, view_only_state))
 
-    reset_button = tk.Button(frame, text=f'Reset {callsign}',
-                             command=lambda labels=labels: reset_grid(frame, state, callsign, mycallsign, labels))
+    reset_button = tk.Button(frame, text=f'Reset {callsign}', command=lambda labels=labels: reset_grid(frame, state, callsign, mycallsign, labels))
 
     reset_button.grid(row=12, column=1, columnspan=10, sticky='nsew')
 
@@ -180,7 +183,7 @@ def main():
             view_only_state = [['b'] * 10 for _ in range(10)]
             save_private_game_state(mycallsign, state, mycallsign)
             create_gui(state, view_only_state, mycallsign, root, mycallsign)
-    for file in OTHER_FILES:  # load other files GUIs
+    for file in OTHER_FILES:
         state, view_only_state, callsign = load_game_state(file, "public")
         if state is not None:
             create_gui(state, view_only_state, callsign, root, mycallsign)
