@@ -66,7 +66,7 @@ Use your mouse to interact with the game:
 
 (Note: once you've placed a ship icon in a cell, then the first click won't go white, but instead skip to red.)
 
-When a ship is placed, the letter turns to upper-case in your _private.txt file, and an anchor icon appears. Only do this
+When (each square of) a ship is placed, the letter turns to upper-case in your _private.txt file, and an anchor icon appears. Only do this
 on the left-hand grid - this is your "Defensive Grid". If you right-click again, the anchor will disappear, and the
 letter will drop to lower-case in your _private.txt file. 
 
@@ -74,6 +74,12 @@ Note: On Mac OS X, it will probably be middle-click instead of right-click, for 
 
 Note: The changes you make on your board will be directly reflected on a public board which is viewable to any new 
 opponent who downlaods it. However, your ships will appear as `b` in the public board, effectively hiding them.
+
+Although I have seen at an example of a game where there are two ships which take 4 spaces, I grew up with the MB game
+IRL, so I use (and recommend) the following: Carrier is 5 spaces. Battleship is 4 spaces, Cruiser is 3, Submarine is 3,
+and finally the Destroyer is 2.
+
+![Example Image](Example.png)
 
 ### Saving The Game
 
