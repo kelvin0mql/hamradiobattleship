@@ -11,7 +11,7 @@ def send_morse_code_to_winkeyer(device_path, message):
     print(f"Opening connection to {WINKEY_PATH} at 1200 baud rate.")
     with serial.Serial(WINKEY_PATH, baudrate=1200) as ser:
         try:
-            message_to_send = b'\x1C\x15' + message.encode() + b'\x1E'
+            message_to_send = b'\x00\x02\x1C\x15' + message.encode()
             print(f"Sending message: {message_to_send}")
             ser.write(message_to_send)
             print("Message sent successfully.")
