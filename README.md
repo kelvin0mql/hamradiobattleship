@@ -110,3 +110,21 @@ fldigi you can use to declare ultimate naval victory!!
 
 Well, you'll need the current state of my battleship-N0MQL.txt file, which is on DropBox, but I have linked to the long
 and convoluted DropBox URL using https://tinyurl.com/battleship-n0mql
+
+## Simplifying It
+
+Not a ham? Just type in your name when it asks for your "callsign". You could use this as a fun way to learn Morse Code,
+flashing a light across the back yards from house to house. Or using walkie talkies.
+
+Don't want to do Dropbox sharing, and don't even use Dropbox? Just make a "Dropbox" directory in your home directory,
+and let the script create a "public" file for your board that never goes anywhere.
+
+Your opponent doesn't need to also run this script. They could be using the old physical game board. They could be using
+pencil and paper.
+
+## Complicating It
+
+You can make more battleship-(callsign).txt files and play in a group of 3, 4, 5 players. At some point, you run out of
+horizontal space on your screen. I fired up a test with battleship-A through battleship-L files, and the last grid lands
+off the right edge of my screen. But I can drag the window left and that last grid still works. So yeah, you can go
+really nuts with it.
