@@ -8,8 +8,15 @@ import serial
 WINKEY_PATH = '/dev/ttyUSB0'
 
 def send_morse_code_to_winkeyer(device_path, message):
-    with serial.Serial(WINKEY_PATH) as ser:
-        ser.write(message.encode())
+    print(f"Opening connection to {WINKEY_PATH} at 1200 baud rate.")
+    with serial.Serial(WINKEY_PATH, baudrate=1200) as ser:
+        try:
+            message_to_send = b'\x1C\x15' + message.encode() + b'\x1E'
+            print(f"Sending message: {message_to_send}")
+            ser.write(message_to_send)
+            print("Message sent successfully.")
+        except serial.SerialException as e:
+            print(f"Failed to send message: {e}.", file=sys.stderr)
 
 def save_private_game_state(callsign, state, mycallsign):
     home = str(Path.home())
