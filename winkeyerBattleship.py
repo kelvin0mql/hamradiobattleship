@@ -97,8 +97,7 @@ def create_gui(state, view_only_state, callsign, root, mycallsign):
     grid_labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 
     def on_click(i, j, label, callsign, state, view_only_state, coordinate):
-
-    # the code inside on_click should be here
+        pass
 
     for j in range(10):
         tk.Label(frame, text=str(j + 1)).grid(row=0, column=j + 1)
