@@ -5,7 +5,7 @@ import os
 import glob
 import serial
 
-WINKEY_PATH = '/dev/ttyUSB0'
+WINKEY_PATH = '/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0'
 
 def send_morse_code_to_winkeyer(device_path, message):
     print(f"Opening connection to {WINKEY_PATH} at 1200 baud rate.")
