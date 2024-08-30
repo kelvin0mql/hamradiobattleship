@@ -104,43 +104,49 @@ def create_gui(state, view_only_state, callsign, root, mycallsign):
     grid_labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 
     def on_click(i, j, label, callsign, state, view_only_state, coordinate):
-        initial_state = state[i][j].lower()
+        initial_state = state[i][j]
+        if state[i][j].islower():
 
-        if initial_state == 'b':
-            state[i][j] = 'm'
-            label.configure(bg='white', text=' ')
+            if initial_state == 'b':
+                state[i][j] = 'm'
+                label.configure(bg='white', text=' ')
 
-        elif initial_state == 'm':
-            state[i][j] = 'h'
-            label.configure(bg='red', text=' ')
+            elif initial_state == 'm':
+                state[i][j] = 'h'
+                label.configure(bg='red', text=' ')
 
-        elif initial_state == 'h':
-            state[i][j] = 's'
-            label.configure(bg='black', text=' ')
+            elif initial_state == 'h':
+                state[i][j] = 's'
+                label.configure(bg='black', text=' ')
 
-        elif initial_state == 's':
-            state[i][j] = 'b'
-            label.configure(bg='light blue', text=' ')
+            elif initial_state == 's':
+                state[i][j] = 'b'
+                label.configure(bg='light blue', text=' ')
 
-        if callsign != mycallsign and initial_state == 'b':
-            message = f" {callsign} DE {mycallsign} {coordinate} {coordinate} KN "
-            print(f"Attempting to send: {message}")
-            send_morse_code_to_winkeyer(WINKEY_PATH, message)
+            if callsign != mycallsign and initial_state == 'b':
+                message = f" {callsign} DE {mycallsign} {coordinate} {coordinate} KN "
+                print(f"Attempting to send: {message}")
+                send_morse_code_to_winkeyer(WINKEY_PATH, message)
 
-        if callsign == mycallsign and initial_state == 'B':
-            message = f" {callsign} DE {mycallsign} HIT HIT KN "
-            print(f"Attempting to send: {message}")
-            send_morse_code_to_winkeyer(WINKEY_PATH, message)
+        else:
+            if callsign == mycallsign and initial_state == 'B':
+                message = f" {callsign} DE {mycallsign} HIT HIT KN "
+                print(f"Attempting to send: {message}")
+                send_morse_code_to_winkeyer(WINKEY_PATH, message)
+                state[i][j] = 'H'
+                label.configure(bg='red', text='⚓')
+            elif callsign == mycallsign and initial_state[i][j] == 'H':
+                message = f" {callsign} DE {mycallsign} HIT HIT KN "
+                print(f"Attempting to send: {message}")
+                send_morse_code_to_winkeyer(WINKEY_PATH, message)
+                state[i][j] = 'S'
+                label.configure(bg='black', text='⚓')
+            elif state[i][j] == 'S':
+                state[i][j] = 'B'
+                label.configure(bg='light blue', text='⚓')
+        if callsign == mycallsign:
             save_private_game_state(callsign, state, mycallsign)
             save_public_game_state(callsign, state, mycallsign)
-
-        elif:callsign == mycallsign and initial_state == 'B':
-        message = f" {callsign} DE {mycallsign} MISS MISS KN "
-        print(f"Attempting to send: {message}")
-        send_morse_code_to_winkeyer(WINKEY_PATH, message)
-        save_private_game_state(callsign, state, mycallsign)
-        save_public_game_state(callsign, state, mycallsign)
-
         else:
             save_opponent_public_state(callsign, state, mycallsign)
 
