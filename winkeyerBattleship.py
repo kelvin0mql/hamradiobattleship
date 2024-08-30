@@ -123,13 +123,24 @@ def create_gui(state, view_only_state, callsign, root, mycallsign):
             label.configure(bg='light blue', text=' ')
 
         if callsign != mycallsign and initial_state == 'b':
-            message = f"{callsign} DE {mycallsign} {coordinate} {coordinate} KN"
+            message = f" {callsign} DE {mycallsign} {coordinate} {coordinate} KN "
             print(f"Attempting to send: {message}")
             send_morse_code_to_winkeyer(WINKEY_PATH, message)
 
-        if callsign == mycallsign:
+        if callsign == mycallsign and initial_state == 'B':
+            message = f" {callsign} DE {mycallsign} HIT HIT KN "
+            print(f"Attempting to send: {message}")
+            send_morse_code_to_winkeyer(WINKEY_PATH, message)
             save_private_game_state(callsign, state, mycallsign)
             save_public_game_state(callsign, state, mycallsign)
+
+        elif:callsign == mycallsign and initial_state == 'B':
+        message = f" {callsign} DE {mycallsign} MISS MISS KN "
+        print(f"Attempting to send: {message}")
+        send_morse_code_to_winkeyer(WINKEY_PATH, message)
+        save_private_game_state(callsign, state, mycallsign)
+        save_public_game_state(callsign, state, mycallsign)
+
         else:
             save_opponent_public_state(callsign, state, mycallsign)
 
