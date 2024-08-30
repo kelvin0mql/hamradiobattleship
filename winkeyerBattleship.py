@@ -96,48 +96,10 @@ def create_gui(state, view_only_state, callsign, root, mycallsign):
     frame.pack(side="left", padx=5, pady=5)
     grid_labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 
-    def on_click(i, j, label, callsign, state, view_only_state):
-        if state[i][j].islower():
-            lower_state = state[i][j].lower()
-            if lower_state == 'b':
-                state[i][j] = 'm'
-                label.configure(bg='white', text=' ')
-                morse_msg = f'{callsign} DE {mycallsign} {coordinate} {coordinate} KN'
-            elif lower_state == 'm':
-                state[i][j] = 'h'
-                label.configure(bg='red', text=' ')
-            elif lower_state == 'h':
-                state[i][j] = 's'
-                label.configure(bg='black', text=' ')
-            elif lower_state == 's':
-                state[i][j] = 'b'
-                label.configure(bg='light blue', text=' ')
-        else:
-            if state[i][j] == 'B':
-                state[i][j] = 'H'
-                label.configure(bg='red', text='⚓')
-            elif state[i][j] == 'H':
-                state[i][j] = 'S'
-                label.configure(bg='black', text='⚓')
-            elif state[i][j] == 'S':
-                state[i][j] = 'B'
-                label.configure(bg='light blue', text='⚓')
-        if callsign == mycallsign:
-            save_private_game_state(callsign, state, mycallsign)
-            save_public_game_state(callsign, state, mycallsign)
-        else:
-            save_opponent_public_state(callsign, state, mycallsign)
+    def on_click(i, j, label, callsign, state, view_only_state, coordinate):
 
-    def on_right_click(i, j, label, callsign, state, view_only_state):
-        if state[i][j].islower():
-            state[i][j] = state[i][j].upper()
-            label.configure(text='⚓')
-        else:
-            state[i][j] = state[i][j].lower()
-            label.configure(text=' ')
-        if callsign == mycallsign:
-            save_private_game_state(callsign, state, mycallsign)
-            save_public_game_state(callsign, state, mycallsign)
+    # All code inside the on_click function which uses grid_labels[i] + str(j + 1)
+    # should be replaced by the coordinate variable.
 
     for j in range(10):
         tk.Label(frame, text=str(j + 1)).grid(row=0, column=j + 1)
@@ -155,17 +117,21 @@ def create_gui(state, view_only_state, callsign, root, mycallsign):
             text = '⚓' if state[i][j].isupper() and callsign == mycallsign else ' '
             label = labels[i][j] = tk.Label(frame, width=2, height=1, bg=color, text=text)
             label.grid(row=i + 1, column=j + 1, padx=1, pady=1)
+            coordinate = grid_labels[i] + str(j + 1)
             label.bind('<Button-1>',
-                       lambda event, i=i, j=j, label=label, callsign=callsign, state=state, view_only_state=view_only_state: on_click(i, j, label, callsign, state, view_only_state))
+                       lambda event, i=i, j=j, label=label, callsign=callsign,
+                              state=state, view_only_state=view_only_state, coordinate=coordinate:
+                       on_click(i, j, label, callsign, state, view_only_state, coordinate))
             label.bind('<Button-3>',
-                       lambda event, i=i, j=j, label=label, callsign=callsign, state=state, view_only_state=view_only_state: on_right_click(i, j, label, callsign, state, view_only_state))
+                       lambda event, i=i, j=j, label=label, callsign=callsign, state=state,
+                              view_only_state=view_only_state:
+                       on_right_click(i, j, label, callsign, state, view_only_state))
 
-    reset_button = tk.Button(frame, text=f'Reset {callsign}', command=lambda labels=labels: reset_grid(frame, state, callsign, mycallsign, labels))
-
+    reset_button = tk.Button(frame, text=f'Reset {callsign}',
+                             command=lambda labels=labels: reset_grid(frame, state, callsign, mycallsign, labels))
     reset_button.grid(row=12, column=1, columnspan=10, sticky='nsew')
 
     return frame
-
 
 def main():
     home = str(Path.home())
