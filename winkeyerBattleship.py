@@ -135,8 +135,8 @@ def create_gui(state, view_only_state, callsign, root, mycallsign):
                 send_morse_code_to_winkeyer(WINKEY_PATH, message)
                 state[i][j] = 'H'
                 label.configure(bg='red', text='⚓')
-            elif callsign == mycallsign and initial_state[i][j] == 'H':
-                message = f" {callsign} DE {mycallsign} HIT HIT KN "
+            elif callsign == mycallsign and initial_state == 'H':
+                message = f" {callsign} DE {mycallsign} SUNK SUNK KN "
                 print(f"Attempting to send: {message}")
                 send_morse_code_to_winkeyer(WINKEY_PATH, message)
                 state[i][j] = 'S'
