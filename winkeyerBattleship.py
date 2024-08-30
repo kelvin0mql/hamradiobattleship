@@ -98,6 +98,46 @@ def create_gui(state, view_only_state, callsign, root, mycallsign):
 
     def on_click(i, j, label, callsign, state, view_only_state, coordinate):
         pass
+        if state[i][j].islower():
+            lower_state = state[i][j].lower()
+            if lower_state == 'b':
+                state[i][j] = 'm'
+                label.configure(bg='white', text=' ')
+            elif lower_state == 'm':
+                state[i][j] = 'h'
+                label.configure(bg='red', text=' ')
+            elif lower_state == 'h':
+                state[i][j] = 's'
+                label.configure(bg='black', text=' ')
+            elif lower_state == 's':
+                state[i][j] = 'b'
+                label.configure(bg='light blue', text=' ')
+        else:
+            if state[i][j] == 'B':
+                state[i][j] = 'H'
+                label.configure(bg='red', text='⚓')
+            elif state[i][j] == 'H':
+                state[i][j] = 'S'
+                label.configure(bg='black', text='⚓')
+            elif state[i][j] == 'S':
+                state[i][j] = 'B'
+                label.configure(bg='light blue', text='⚓')
+        if callsign == mycallsign:
+            save_private_game_state(callsign, state, mycallsign)
+            save_public_game_state(callsign, state, mycallsign)
+        else:
+            save_opponent_public_state(callsign, state, mycallsign)
+
+    def on_right_click(i, j, label, callsign, state, view_only_state):
+        if state[i][j].islower():
+            state[i][j] = state[i][j].upper()
+            label.configure(text='⚓')
+        else:
+            state[i][j] = state[i][j].lower()
+            label.configure(text=' ')
+        if callsign == mycallsign:
+            save_private_game_state(callsign, state, mycallsign)
+            save_public_game_state(callsign, state, mycallsign)
 
     for j in range(10):
         tk.Label(frame, text=str(j + 1)).grid(row=0, column=j + 1)
