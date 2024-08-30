@@ -98,34 +98,31 @@ def create_gui(state, view_only_state, callsign, root, mycallsign):
 
     def on_click(i, j, label, callsign, state, view_only_state, coordinate):
 
-    # All code inside the on_click function which uses grid_labels[i] + str(j + 1)
-    # should be replaced by the coordinate variable.
-
-    for j in range(10):
-        tk.Label(frame, text=str(j + 1)).grid(row=0, column=j + 1)
-
-    for i in range(10):
-        tk.Label(frame, text=grid_labels[i]).grid(row=i + 1, column=0)
-
-    labels = [[None] * 10 for _ in range(10)]
-
-    for i in range(10):
         for j in range(10):
-            color = ('light blue' if state[i][j] == 'b' or state[i][j] == 'B' else
-                     'white' if state[i][j] == 'm' else
-                     'red' if state[i][j].lower() == 'h' else 'black')
-            text = '⚓' if state[i][j].isupper() and callsign == mycallsign else ' '
-            label = labels[i][j] = tk.Label(frame, width=2, height=1, bg=color, text=text)
-            label.grid(row=i + 1, column=j + 1, padx=1, pady=1)
-            coordinate = grid_labels[i] + str(j + 1)
-            label.bind('<Button-1>',
-                       lambda event, i=i, j=j, label=label, callsign=callsign,
-                              state=state, view_only_state=view_only_state, coordinate=coordinate:
-                       on_click(i, j, label, callsign, state, view_only_state, coordinate))
-            label.bind('<Button-3>',
-                       lambda event, i=i, j=j, label=label, callsign=callsign, state=state,
-                              view_only_state=view_only_state:
-                       on_right_click(i, j, label, callsign, state, view_only_state))
+            tk.Label(frame, text=str(j + 1)).grid(row=0, column=j + 1)
+
+        for i in range(10):
+            tk.Label(frame, text=grid_labels[i]).grid(row=i + 1, column=0)
+
+        labels = [[None] * 10 for _ in range(10)]
+
+        for i in range(10):
+            for j in range(10):
+                color = ('light blue' if state[i][j] == 'b' or state[i][j] == 'B' else
+                         'white' if state[i][j] == 'm' else
+                         'red' if state[i][j].lower() == 'h' else 'black')
+                text = '⚓' if state[i][j].isupper() and callsign == mycallsign else ' '
+                label = labels[i][j] = tk.Label(frame, width=2, height=1, bg=color, text=text)
+                label.grid(row=i + 1, column=j + 1, padx=1, pady=1)
+                coordinate = grid_labels[i] + str(j + 1)
+                label.bind('<Button-1>',
+                           lambda event, i=i, j=j, label=label, callsign=callsign,
+                                  state=state, view_only_state=view_only_state, coordinate=coordinate:
+                           on_click(i, j, label, callsign, state, view_only_state, coordinate))
+                label.bind('<Button-3>',
+                           lambda event, i=i, j=j, label=label, callsign=callsign, state=state,
+                                  view_only_state=view_only_state:
+                           on_right_click(i, j, label, callsign, state, view_only_state))
 
     reset_button = tk.Button(frame, text=f'Reset {callsign}',
                              command=lambda labels=labels: reset_grid(frame, state, callsign, mycallsign, labels))
