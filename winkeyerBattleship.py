@@ -107,9 +107,19 @@ def create_gui(state, view_only_state, callsign, root, mycallsign):
         initial_state = state[i][j]
         if state[i][j].islower():
 
-            if initial_state == 'b':
+            if callsign != mycallsign and initial_state == 'b':
+                message = f" {callsign} {coordinate} {coordinate} {mycallsign} K"
+                print(f"Attempting to send: {message}")
+                send_morse_code_to_winkeyer(WINKEY_PATH, message)
                 state[i][j] = 'm'
                 label.configure(bg='white', text=' ')
+
+            elif callsign == mycallsign and initial_state == 'b':
+                message = f" MISS MISS  "
+                print(f"Attempting to send: {message}")
+                send_morse_code_to_winkeyer(WINKEY_PATH, message)
+                state[i][j] = 'm'
+                label.configure(bg='white', text='')
 
             elif initial_state == 'm':
                 state[i][j] = 'h'
@@ -123,17 +133,6 @@ def create_gui(state, view_only_state, callsign, root, mycallsign):
                 state[i][j] = 'b'
                 label.configure(bg='light blue', text=' ')
 
-            elif callsign != mycallsign and initial_state == 'b':
-                message = f" {callsign} {coordinate} {coordinate} {mycallsign} K"
-                print(f"Attempting to send: {message}")
-                send_morse_code_to_winkeyer(WINKEY_PATH, message)
-
-            elif callsign == mycallsign and initial_state == 'b':
-                message = f" MISS MISS  "
-                print(f"Attempting to send: {message}")
-                send_morse_code_to_winkeyer(WINKEY_PATH, message)
-                state[i][j] = 'm'
-                label.configure(bg='white', text='')
         else:
             if callsign == mycallsign and initial_state == 'B':
                 message = f" HIT HIT "
@@ -141,15 +140,18 @@ def create_gui(state, view_only_state, callsign, root, mycallsign):
                 send_morse_code_to_winkeyer(WINKEY_PATH, message)
                 state[i][j] = 'H'
                 label.configure(bg='red', text='⚓')
+
             elif callsign == mycallsign and initial_state == 'H':
                 message = f" SUNK SUNK "
                 print(f"Attempting to send: {message}")
                 send_morse_code_to_winkeyer(WINKEY_PATH, message)
                 state[i][j] = 'S'
                 label.configure(bg='black', text='⚓')
+
             elif state[i][j] == 'S':
                 state[i][j] = 'B'
                 label.configure(bg='light blue', text='⚓')
+
         if callsign == mycallsign:
             save_private_game_state(callsign, state, mycallsign)
             save_public_game_state(callsign, state, mycallsign)
