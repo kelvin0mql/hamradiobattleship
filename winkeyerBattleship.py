@@ -124,7 +124,7 @@ def create_gui(state, view_only_state, callsign, root, mycallsign):
                 label.configure(bg='light blue', text=' ')
 
             if callsign != mycallsign and initial_state == 'b':
-                message = f" {callsign} {coordinate} {coordinate} {mycallsign} KN "
+                message = f" {callsign} {coordinate} {coordinate} {mycallsign} K"
                 print(f"Attempting to send: {message}")
                 send_morse_code_to_winkeyer(WINKEY_PATH, message)
 
