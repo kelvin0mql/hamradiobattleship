@@ -8,7 +8,7 @@ import serial
 WINKEY_PATH = '/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0'
 
 def send_morse_code_to_winkeyer(device_path, message):
-    print(f"Opening connection to {WINKEY_PATH} at 1200 baud rate.")
+    print(f"Opening connection to {WINKEY_PATH} at 1200 baud.")
     with serial.Serial(WINKEY_PATH, baudrate=1200) as ser:
         try:
             message_to_send = b'\x00\x02\x1C\x15' + message.encode()
@@ -124,19 +124,19 @@ def create_gui(state, view_only_state, callsign, root, mycallsign):
                 label.configure(bg='light blue', text=' ')
 
             if callsign != mycallsign and initial_state == 'b':
-                message = f" {callsign} DE {mycallsign} {coordinate} {coordinate} KN "
+                message = f" {callsign} {coordinate} {coordinate} {mycallsign} KN "
                 print(f"Attempting to send: {message}")
                 send_morse_code_to_winkeyer(WINKEY_PATH, message)
 
         else:
             if callsign == mycallsign and initial_state == 'B':
-                message = f" {callsign} DE {mycallsign} HIT HIT KN "
+                message = f" {callsign} HIT HIT "
                 print(f"Attempting to send: {message}")
                 send_morse_code_to_winkeyer(WINKEY_PATH, message)
                 state[i][j] = 'H'
                 label.configure(bg='red', text='⚓')
             elif callsign == mycallsign and initial_state == 'H':
-                message = f" {callsign} DE {mycallsign} SUNK SUNK KN "
+                message = f" SUNK SUNK "
                 print(f"Attempting to send: {message}")
                 send_morse_code_to_winkeyer(WINKEY_PATH, message)
                 state[i][j] = 'S'
